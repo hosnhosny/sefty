@@ -1,0 +1,61 @@
+name: attendance_app
+description: "نظام الأمن والسلامة - SAFI FOOD COMPLEX"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.5
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # ── الأساسي ──────────────────────────────
+  cupertino_icons: ^1.0.8
+
+  # ── PocketBase ───────────────────────────
+  pocketbase: ^0.18.0
+
+  # ── الصور والملفات ───────────────────────
+  image_picker: ^1.1.2
+  http: ^1.2.2
+
+  # ── تشغيل الفيديو ────────────────────────
+  video_player: ^2.9.2
+  chewie: ^1.8.5
+
+  # ── Excel و PDF ──────────────────────────
+  syncfusion_flutter_xlsio: ^26.2.1
+  share_plus: ^10.0.0
+  path_provider: ^2.1.5
+
+  # ── State Management ─────────────────────
+  flutter_riverpod: ^2.5.1
+
+  # ── حفظ بيانات تسجيل الدخول محلياً ──────
+  shared_preferences: ^2.3.2
+
+  # ── شاشة الإقلاع الأصيلة ─────────────────
+  flutter_native_splash: ^2.4.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+# ── حسم تعارضات المكتبات ──────────────────
+dependency_overrides:
+  intl: ^0.20.2
+
+# ── إعدادات Native Splash ──────────────────
+flutter_native_splash:
+  color: "#1565C0"
+  android_12:
+    color: "#1565C0"
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/videos/splash.mp4

@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "325859956346",
+    "firebase_url": "https://safifood-3e6900-default-rtdb.firebaseio.com",
+    "project_id": "safifood-3e6900",
+    "storage_bucket": "safifood-3e6900.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:325859956346:android:34d6d6ee83bd3b791a0dc3",
+        "android_client_info": {
+          "package_name": "com.example.attendance_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCOzSPwWo5YYV_fJwTIE5h8-0VgexuGBwc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
