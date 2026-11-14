@@ -218,7 +218,7 @@ class _EmployeesManagementScreenState
             return ListView.separated(
               padding: const EdgeInsets.fromLTRB(12, 12, 12, 80),
               itemCount: employees.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 8),
+              separatorBuilder: (_, _) => const SizedBox(height: 8),
               itemBuilder: (ctx, i) {
                 final e = employees[i];
                 final bool active = e['is_active'] ?? true;

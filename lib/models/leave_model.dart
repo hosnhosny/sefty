@@ -7,6 +7,7 @@ import '../utils/enums.dart';
 class LeaveModel {
   final String? id;
   final String leaveNumber;
+  final String receiptNumber; // الرقم التسلسلي المطبوع على الإيصال الورقي
   final DateTime createdAt;
 
   final String requestedById;
@@ -33,6 +34,7 @@ class LeaveModel {
   LeaveModel({
     this.id,
     required this.leaveNumber,
+    required this.receiptNumber,
     required this.createdAt,
     required this.requestedById,
     required this.requestedByName,
@@ -62,11 +64,17 @@ class LeaveModel {
     final exitTime = DateTime.parse(d['exit_time']);
     final expected = DateTime.parse(d['expected_return']);
 
+    // حقل "created" لم يعد خاصية مخصصة مضمونة الوجود في RecordModel، لذلك
+    // نقرأه عبر get<T> العام بدل record.created المهجورة، مع تعامل آمن
+    // في حال كان غائباً أو فارغاً.
+    final createdStr = record.get<String?>('created');
+
     return LeaveModel(
       id: record.id,
       leaveNumber: d['leave_number'] ?? '',
-      createdAt: record.created.isNotEmpty
-          ? DateTime.parse(record.created)
+      receiptNumber: d['receipt_number'] ?? '',
+      createdAt: (createdStr != null && createdStr.isNotEmpty)
+          ? DateTime.parse(createdStr)
           : DateTime.now(),
       requestedById: d['requested_by_id'] ?? '',
       requestedByName: d['requested_by_name'] ?? '',
@@ -95,6 +103,7 @@ class LeaveModel {
   Map<String, dynamic> toMap() {
     return {
       'leave_number': leaveNumber,
+      'receipt_number': receiptNumber,
       'requested_by_id': requestedById,
       'requested_by_name': requestedByName,
       'employee_id': employeeId,
@@ -130,11 +139,12 @@ class LeaveModel {
     if (actualDuration == null) return '---';
     final hours = actualDuration!.inHours;
     final minutes = actualDuration!.inMinutes % 60;
-    return '${hours}س ${minutes}د';
+    return '$hoursس $minutesد';
   }
 
   LeaveModel copyWith({
     String? leaveNumber,
+    String? receiptNumber,
     DateTime? createdAt,
     String? requestedById,
     String? requestedByName,
@@ -152,6 +162,7 @@ class LeaveModel {
     return LeaveModel(
       id: id,
       leaveNumber: leaveNumber ?? this.leaveNumber,
+      receiptNumber: receiptNumber ?? this.receiptNumber,
       createdAt: createdAt ?? this.createdAt,
       requestedById: requestedById ?? this.requestedById,
       requestedByName: requestedByName ?? this.requestedByName,

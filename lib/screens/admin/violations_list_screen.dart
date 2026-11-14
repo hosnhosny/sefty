@@ -171,7 +171,7 @@ class ViolationsListScreen extends StatelessWidget {
                             width: 100,
                             height: 100,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => Container(
+                            errorBuilder: (_, _, _) => Container(
                               width: 100,
                               height: 100,
                               color: Colors.grey.shade200,
@@ -206,7 +206,7 @@ class ViolationsListScreen extends StatelessWidget {
               maxScale: 5,
               child: Image.network(
                 url,
-                errorBuilder: (_, __, ___) => const Padding(
+                errorBuilder: (_, _, _) => const Padding(
                   padding: EdgeInsets.all(24),
                   child: Icon(Icons.broken_image,
                       color: Colors.white, size: 48),

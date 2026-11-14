@@ -12,6 +12,19 @@ class ExcelService {
   final DatabaseService _db = DatabaseService();
 
   // ───────────────────────────────────────────────
+  // SHARE HELPER (share_plus الحديثة)
+  // ───────────────────────────────────────────────
+
+  Future<void> _shareFile(String path, String text) async {
+    await SharePlus.instance.share(
+      ShareParams(
+        files: [XFile(path)],
+        text: text,
+      ),
+    );
+  }
+
+  // ───────────────────────────────────────────────
   // EXPORT VIOLATIONS
   // ───────────────────────────────────────────────
 
@@ -134,10 +147,9 @@ class ExcelService {
         await _db.batchMarkAsExported(exportedIds);
       }
 
-      // 🟢 الاستدعاء المباشر والمستقر لمكتبة share_plus
-      await Share.shareXFiles(
-        [XFile(path)],
-        text: 'تقرير المخالفات - ${DateTime.now().toIso8601String().split('T')[0]}',
+      await _shareFile(
+        path,
+        'تقرير المخالفات - ${DateTime.now().toIso8601String().split('T')[0]}',
       );
 
       return path;
@@ -197,10 +209,9 @@ class ExcelService {
       await file.writeAsBytes(bytes);
       workbook.dispose();
 
-      // 🟢 الاستدعاء المباشر والمستقر لمكتبة share_plus
-      await Share.shareXFiles(
-        [XFile(path)],
-        text: 'تقرير إذن الانصراف - ${DateTime.now().toIso8601String().split('T')[0]}',
+      await _shareFile(
+        path,
+        'تقرير إذن الانصراف - ${DateTime.now().toIso8601String().split('T')[0]}',
       );
 
       return path;
@@ -223,7 +234,8 @@ class ExcelService {
 
       if (violationRecords.isEmpty && leaveRecords.isEmpty) return null;
 
-      final violations = violationRecords.map(ViolationModel.fromRecord).toList();
+      final violations =
+      violationRecords.map(ViolationModel.fromRecord).toList();
       final leaves = leaveRecords.map(LeaveModel.fromRecord).toList();
 
       final workbook = xlsio.Workbook();
@@ -248,10 +260,9 @@ class ExcelService {
       await file.writeAsBytes(bytes);
       workbook.dispose();
 
-      // 🟢 الاستدعاء المباشر والمستقر لمكتبة share_plus
-      await Share.shareXFiles(
-        [XFile(path)],
-        text: 'التقرير الشامل - ${DateTime.now().toIso8601String().split('T')[0]}',
+      await _shareFile(
+        path,
+        'التقرير الشامل - ${DateTime.now().toIso8601String().split('T')[0]}',
       );
 
       return path;
@@ -282,8 +293,10 @@ class ExcelService {
     int row = 2;
     for (final v in violations) {
       sheet.getRangeByIndex(row, 1).setText(v.violationNumber);
-      sheet.getRangeByIndex(row, 2).setText('${v.createdAt.year}/${v.createdAt.month}/${v.createdAt.day}');
-      sheet.getRangeByIndex(row, 3).setText('${v.createdAt.hour}:${v.createdAt.minute}');
+      sheet.getRangeByIndex(row, 2).setText(
+          '${v.createdAt.year}/${v.createdAt.month}/${v.createdAt.day}');
+      sheet.getRangeByIndex(row, 3)
+          .setText('${v.createdAt.hour}:${v.createdAt.minute}');
       sheet.getRangeByIndex(row, 4).setText(v.securityOfficerName);
       sheet.getRangeByIndex(row, 5).setText(v.employeeName);
       sheet.getRangeByIndex(row, 6).setText(v.employeeId);
@@ -313,15 +326,20 @@ class ExcelService {
     int row = 2;
     for (final l in leaves) {
       sheet.getRangeByIndex(row, 1).setText(l.leaveNumber);
-      sheet.getRangeByIndex(row, 2).setText('${l.createdAt.year}/${l.createdAt.month}/${l.createdAt.day}');
+      sheet.getRangeByIndex(row, 2).setText(
+          '${l.createdAt.year}/${l.createdAt.month}/${l.createdAt.day}');
       sheet.getRangeByIndex(row, 3).setText(l.requestedByName);
       sheet.getRangeByIndex(row, 4).setText(l.employeeName);
       sheet.getRangeByIndex(row, 5).setText(l.employeeDepartment);
       sheet.getRangeByIndex(row, 6).setText(l.reasonLabel);
-      sheet.getRangeByIndex(row, 7).setText('${l.exitTime.hour}:${l.exitTime.minute}');
-      sheet.getRangeByIndex(row, 8).setText('${l.expectedReturn.hour}:${l.expectedReturn.minute}');
+      sheet.getRangeByIndex(row, 7)
+          .setText('${l.exitTime.hour}:${l.exitTime.minute}');
+      sheet.getRangeByIndex(row, 8)
+          .setText('${l.expectedReturn.hour}:${l.expectedReturn.minute}');
       sheet.getRangeByIndex(row, 9).setText(
-        l.actualReturn != null ? '${l.actualReturn!.hour}:${l.actualReturn!.minute}' : '---',
+        l.actualReturn != null
+            ? '${l.actualReturn!.hour}:${l.actualReturn!.minute}'
+            : '---',
       );
       sheet.getRangeByIndex(row, 10).setText(l.statusLabel);
       row++;

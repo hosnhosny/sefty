@@ -24,8 +24,8 @@ class AppColors {
 
 class AppStrings {
   static const String appName     = 'نظام الأمن والسلامة';
-  static const String companyName = 'SAFI FOOD COMPLEX';
-  static const String companyAr   = 'مجمع صافي الغذائي';
+  static const String companyName = 'ALDAFNIYA FOOD COMPLEX';
+  static const String companyAr   = 'مجمع الدافنية الغذائي';
 
   // Roles
   static const String admin    = 'مدير';

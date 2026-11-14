@@ -9,14 +9,14 @@ class AuthService {
   static final ValueNotifier<UserModel?> currentUserNotifier =
   ValueNotifier<UserModel?>(null);
 
-  /// المستخدم الحالي كـ UserModel (يُقرأ من pb.authStore.model المخزّن محلياً)
+  /// المستخدم الحالي كـ UserModel (يُقرأ من pb.authStore.record المخزّن محلياً)
   UserModel? get currentUser {
-    final record = pb.authStore.model;
+    final record = pb.authStore.record;
     if (record == null) return null;
     return UserModel.fromRecord(record);
   }
 
-  String? get currentUserId => pb.authStore.model?.id;
+  String? get currentUserId => pb.authStore.record?.id;
 
   bool get isLoggedIn => pb.authStore.isValid;
 
@@ -29,11 +29,8 @@ class AuthService {
         password,
       );
 
+      // auth.record غير قابل لأن يكون null في النسخ الحديثة من PocketBase
       final record = auth.record;
-      if (record == null) {
-        pb.authStore.clear();
-        return 'تعذر الحصول على بيانات الحساب';
-      }
 
       final isActive = record.data['is_active'] ?? true;
       if (!isActive) {
@@ -65,7 +62,7 @@ class AuthService {
   Future<UserModel?> getCurrentUserData() async {
     if (!pb.authStore.isValid) return null;
     try {
-      final id = pb.authStore.model?.id;
+      final id = pb.authStore.record?.id;
       if (id == null) return null;
       final record = await pb.collection('users').getOne(id);
       return UserModel.fromRecord(record);

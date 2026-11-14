@@ -31,6 +31,7 @@ class UserModel {
 
   /// يبني UserModel من RecordModel القادم من مجموعة "users" في PocketBase
   factory UserModel.fromRecord(RecordModel record) {
+    final createdStr = record.get<String?>('created');
     return UserModel(
       uid: record.id,
       name: record.getStringValue('name'),
@@ -41,8 +42,8 @@ class UserModel {
       points: record.getIntValue('points'),
       walletBalance: (record.data['wallet_balance'] ?? 0).toDouble(),
       isActive: record.data['is_active'] ?? true,
-      createdAt: record.created.isNotEmpty
-          ? DateTime.parse(record.created)
+      createdAt: (createdStr != null && createdStr.isNotEmpty)
+          ? DateTime.parse(createdStr)
           : DateTime.now(),
       phone: record.data['phone'],
     );

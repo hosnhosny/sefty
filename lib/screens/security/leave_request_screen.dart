@@ -1,5 +1,6 @@
 // lib/screens/security/add_leave_screen.dart
 
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import '../../models/user_model.dart';
@@ -23,8 +24,14 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
   final _storage   = StorageService();
 
   // ─── Controllers ────────────────────────────────────────────────────
-  final _searchCtrl        = TextEditingController();
-  final _reasonDetailsCtrl = TextEditingController();
+  final _searchCtrl         = TextEditingController();
+  final _reasonDetailsCtrl  = TextEditingController();
+  final _receiptNumberCtrl  = TextEditingController();
+
+  // ─── Receipt Number Check State ────────────────────────────────────
+  bool  _isCheckingReceipt  = false;
+  bool  _receiptAlreadyUsed = false;
+  Timer? _receiptDebounce;
 
   // ─── Employee State ──────────────────────────────────────────────────
   Map<String, dynamic>?      _selectedEmployee;
@@ -123,6 +130,31 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
   }
 
   // ════════════════════════════════════════════════════════════════════
+  // RECEIPT NUMBER DUPLICATE CHECK
+  // ════════════════════════════════════════════════════════════════════
+
+  /// يتحقق (بعد تأخير بسيط 500ms لتجنب طلب مع كل حرف) إذا كان الرقم
+  /// التسلسلي للإيصال الورقي مستخدماً من قبل، ويعرض تنبيه خطر فوري.
+  void _onReceiptNumberChanged(String value) {
+    _receiptDebounce?.cancel();
+    if (_receiptAlreadyUsed) setState(() => _receiptAlreadyUsed = false);
+
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) return;
+
+    _receiptDebounce = Timer(const Duration(milliseconds: 500), () async {
+      setState(() => _isCheckingReceipt = true);
+      final used = await _db.isReceiptNumberUsed(trimmed);
+      if (mounted) {
+        setState(() {
+          _isCheckingReceipt = false;
+          _receiptAlreadyUsed = used;
+        });
+      }
+    });
+  }
+
+  // ════════════════════════════════════════════════════════════════════
   // DATE / TIME PICKERS
   // ════════════════════════════════════════════════════════════════════
 
@@ -201,6 +233,16 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
+    // تحقق أخير من تكرار رقم الإيصال قبل الحفظ مباشرة (حماية من حالة
+    // تغيّر بين آخر فحص أثناء الكتابة ولحظة الإرسال الفعلية)
+    final receiptTrimmed = _receiptNumberCtrl.text.trim();
+    final currentlyUsed = await _db.isReceiptNumberUsed(receiptTrimmed);
+    if (currentlyUsed) {
+      setState(() => _receiptAlreadyUsed = true);
+      _showSnack('⚠️ هذا الإيصال مستخدم من قبل! لا يمكن المتابعة', Colors.red);
+      return;
+    }
+
     if (_selectedEmployee == null) {
       _showSnack('يجب اختيار موظف من القائمة', Colors.red);
       return;
@@ -230,6 +272,7 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
       // بناء النموذج
       final leave = LeaveModel(
         leaveNumber:         _leaveNumber,
+        receiptNumber:       receiptTrimmed,
         createdAt:           DateTime.now(),
         requestedById:       widget.currentUser.uid,
         requestedByName:     widget.currentUser.name,
@@ -380,9 +423,12 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
       _evidenceImage     = null;
       _isFinalExit       = false;
       _filteredEmployees = _allEmployees;
+      _receiptAlreadyUsed = false;
+      _isCheckingReceipt  = false;
     });
     _searchCtrl.clear();
     _reasonDetailsCtrl.clear();
+    _receiptNumberCtrl.clear();
     _loadLeaveNumber();
   }
 
@@ -567,7 +613,7 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
               shrinkWrap: true,
               padding: EdgeInsets.zero,
               itemCount: _filteredEmployees.length,
-              separatorBuilder: (_, __) =>
+              separatorBuilder: (_, _) =>
               const Divider(height: 1, indent: 56),
               itemBuilder: (ctx, i) {
                 final emp = _filteredEmployees[i];
@@ -675,6 +721,94 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // ── الرقم التسلسلي للإيصال الورقي ──────────────────────
+        const Text(
+          'الرقم التسلسلي للإيصال الورقي *',
+          style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+        ),
+        const SizedBox(height: 10),
+        TextFormField(
+          controller: _receiptNumberCtrl,
+          textCapitalization: TextCapitalization.characters,
+          decoration: InputDecoration(
+            hintText: 'مثال: K3561165',
+            prefixIcon: const Icon(Icons.confirmation_number_outlined),
+            suffixIcon: _isCheckingReceipt
+                ? const Padding(
+              padding: EdgeInsets.all(12),
+              child: SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            )
+                : _receiptAlreadyUsed
+                ? const Icon(Icons.error, color: Colors.red)
+                : (_receiptNumberCtrl.text.trim().isNotEmpty
+                ? const Icon(Icons.check_circle, color: Colors.green)
+                : null),
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12)),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: _receiptAlreadyUsed
+                    ? Colors.red
+                    : Colors.grey.shade300,
+                width: _receiptAlreadyUsed ? 2 : 1,
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: _receiptAlreadyUsed
+                    ? Colors.red
+                    : Colors.teal.shade700,
+                width: 2,
+              ),
+            ),
+          ),
+          onChanged: _onReceiptNumberChanged,
+          validator: (v) {
+            if (v == null || v.trim().isEmpty) {
+              return 'يجب إدخال الرقم التسلسلي المطبوع على الإيصال';
+            }
+            return null;
+          },
+        ),
+
+        // ── تنبيه خطر عند تكرار الإيصال ─────────────────────────
+        if (_receiptAlreadyUsed) ...[
+          const SizedBox(height: 10),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.red.shade50,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Colors.red, width: 1.5),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.warning_amber_rounded,
+                    color: Colors.red, size: 26),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    '⚠️ خطر: هذا الإيصال مستخدم من قبل مسبقاً! لا يمكن تسجيله مرة أخرى.',
+                    style: TextStyle(
+                      color: Colors.red.shade900,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+
+        const SizedBox(height: 20),
+
         // سبب الإذن
         const Text(
           'سبب الانصراف *',
@@ -1034,7 +1168,7 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
       width: double.infinity,
       height: 56,
       child: ElevatedButton(
-        onPressed: _isLoading ? null : _submit,
+        onPressed: (_isLoading || _receiptAlreadyUsed) ? null : _submit,
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.teal.shade700,
           foregroundColor: Colors.white,
@@ -1242,6 +1376,8 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
   void dispose() {
     _searchCtrl.dispose();
     _reasonDetailsCtrl.dispose();
+    _receiptNumberCtrl.dispose();
+    _receiptDebounce?.cancel();
     super.dispose();
   }
 }

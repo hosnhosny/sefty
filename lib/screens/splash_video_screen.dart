@@ -55,8 +55,8 @@ class _SplashVideoScreenState extends State<SplashVideoScreen> {
     Navigator.pushReplacement(
       context,
       PageRouteBuilder(
-        pageBuilder: (_, __, ___) => const AuthGate(),
-        transitionsBuilder: (_, animation, __, child) {
+        pageBuilder: (_, _, _) => const AuthGate(),
+        transitionsBuilder: (_, animation, _, child) {
           return FadeTransition(opacity: animation, child: child);
         },
         transitionDuration: const Duration(milliseconds: 500),

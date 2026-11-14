@@ -236,8 +236,36 @@ class DatabaseService {
     }
   }
 
+  /// يتحقق إذا كان الرقم التسلسلي للإيصال الورقي مستخدماً من قبل في أي
+  /// إذن انصراف سابق. يُستخدم لعرض تنبيه فوري للموظف الأمني أثناء الكتابة،
+  /// وكذلك كتحقق أخير قبل الحفظ مباشرة. الحماية النهائية والمضمونة 100%
+  /// تبقى قيد "Unique" على حقل receipt_number داخل PocketBase نفسه (لتغطية
+  /// حالة إرسال طلبين في نفس اللحظة بالضبط).
+  Future<bool> isReceiptNumberUsed(String receiptNumber) async {
+    final trimmed = receiptNumber.trim();
+    if (trimmed.isEmpty) return false;
+    try {
+      final result = await pb.collection('leaves').getList(
+        page: 1,
+        perPage: 1,
+        filter: pb.filter(
+          'receipt_number = {:num}',
+          {'num': trimmed},
+        ),
+      );
+      return result.items.isNotEmpty;
+    } catch (_) {
+      // في حال فشل الاتصال لا نمنع المستخدم بناءً على خطأ شبكة عابر،
+      // لكن قيد Unique بقاعدة البيانات يبقى خط الدفاع الأخير.
+      return false;
+    }
+  }
+
   /// يُعيد الـ RecordModel الفعلي المحفوظ حتى تقدر الشاشة تقرأ منه الرقم
   /// النهائي بعد أي إعادة محاولة بسبب تعارض في leave_number.
+  /// إذا كان تعارض الحفظ بسبب receipt_number مكرر (إيصال مستخدم من قبل)،
+  /// لا نعيد المحاولة تلقائياً (لأنه رقم مطبوع فعلياً على ورقة ولا يصح
+  /// توليد بديل له)، بل نرمي استثناء واضح تعرضه الشاشة للمستخدم مباشرة.
   Future<RecordModel> addLeave(LeaveModel leave, {int maxRetries = 3}) async {
     var current = leave;
 
@@ -247,10 +275,17 @@ class DatabaseService {
         await pb.collection('leaves').create(body: current.toMap());
         return record;
       } on ClientException catch (e) {
-        final isDuplicate = e.statusCode == 400 &&
+        final isDuplicateReceipt = e.statusCode == 400 &&
+            e.response['data']?['receipt_number'] != null;
+
+        if (isDuplicateReceipt) {
+          throw Exception('⚠️ هذا الرقم التسلسلي للإيصال مستخدم من قبل مسبقاً');
+        }
+
+        final isDuplicateLeaveNumber = e.statusCode == 400 &&
             e.response['data']?['leave_number'] != null;
 
-        if (isDuplicate && attempt < maxRetries) {
+        if (isDuplicateLeaveNumber && attempt < maxRetries) {
           final newNumber = await getNextLeaveNumber();
           current = current.copyWith(leaveNumber: newNumber);
           continue;

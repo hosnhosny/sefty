@@ -91,7 +91,7 @@ class SettingsScreen extends StatelessWidget {
               child: ListTile(
                 leading: const Icon(Icons.info_outline, color: Colors.blue),
                 title: const Text('عن التطبيق'),
-                subtitle: const Text('نظام الأمن والسلامة - SAFI FOOD COMPLEX'),
+                subtitle: const Text('نظام الأمن والسلامة - ALDAFNIYA FOOD COMPLEX'),
                 onTap: () {
                   showAboutDialog(
                     context: context,

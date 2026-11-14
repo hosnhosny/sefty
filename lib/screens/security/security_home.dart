@@ -1,15 +1,19 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../models/user_model.dart';
 import '../../services/auth_service.dart';
 import '../../services/notification_service.dart';
-import '../../services/theme_service.dart'; // ✅ NEW
+import '../../services/theme_service.dart';
 import '../notifications_screen.dart';
-import '../settings_screen.dart'; // ✅ NEW
+import '../settings_screen.dart';
 import 'add_violation_screen.dart';
 import 'my_violations_screen.dart';
 import 'leave_request_screen.dart';
 import 'write_report_screen.dart';
+import 'extinguisher_inspection_screen.dart'; // 🧯 شاشة الكشف عن الأسطوانات
+import 'extinguishers_management_screen.dart'; // 🗄️ شاشة إدارة الأسطوانات
 import '../login_screen.dart';
+import '../../utils/constants.dart';
 
 class SecurityHome extends StatefulWidget {
   final UserModel securityUser;
@@ -23,15 +27,24 @@ class _SecurityHomeState extends State<SecurityHome> {
   final _authService = AuthService();
   final _notificationService = NotificationService();
   int _unreadCount = 0;
+  StreamSubscription<int>? _unreadSub;
 
   @override
   void initState() {
     super.initState();
-    _notificationService
+    _unreadSub = _notificationService
         .getUnreadCount(widget.securityUser.uid)
         .listen((count) {
       if (mounted) setState(() => _unreadCount = count);
     });
+  }
+
+  @override
+  void dispose() {
+    // بدون هذا الإلغاء، قد يصل حدث من الـ stream بعد تدمير الشاشة
+    // ويستدعي setState على ويدجت لم يعد موجوداً.
+    _unreadSub?.cancel();
+    super.dispose();
   }
 
   Future<void> _logout() async {
@@ -53,14 +66,14 @@ class _SecurityHomeState extends State<SecurityHome> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor, // ✅ NEW: دعم الثيم الداكن
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
           title: const Text('الأمن والسلامة'),
           backgroundColor: const Color(0xFF00838F),
           foregroundColor: Colors.white,
           elevation: 0,
           actions: [
-            // ✅ NEW: زر تبديل الوضع الداكن
+            // زر تبديل الوضع الداكن
             ValueListenableBuilder<ThemeMode>(
               valueListenable: ThemeService.themeNotifier,
               builder: (context, currentMode, child) {
@@ -75,7 +88,7 @@ class _SecurityHomeState extends State<SecurityHome> {
                 );
               },
             ),
-            // ✅ NEW: زر الإعدادات
+            // زر الإعدادات
             IconButton(
               icon: const Icon(Icons.settings),
               tooltip: 'الإعدادات',
@@ -92,8 +105,8 @@ class _SecurityHomeState extends State<SecurityHome> {
                   onPressed: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => NotificationsScreen(
-                          userId: widget.securityUser.uid),
+                      builder: (_) =>
+                          NotificationsScreen(userId: widget.securityUser.uid),
                     ),
                   ),
                 ),
@@ -188,7 +201,8 @@ class _SecurityHomeState extends State<SecurityHome> {
                                   Text(
                                     'نقاطي',
                                     style: TextStyle(
-                                      color: Colors.white.withValues(alpha: 0.75),
+                                      color:
+                                      Colors.white.withValues(alpha: 0.75),
                                       fontSize: 11,
                                     ),
                                   ),
@@ -225,7 +239,7 @@ class _SecurityHomeState extends State<SecurityHome> {
                             color: Colors.white54, size: 14),
                         const SizedBox(width: 6),
                         Text(
-                          'SAFI FOOD COMPLEX',
+                          'ALDAFNIYA FOOD COMPLEX',
                           style: TextStyle(
                             color: Colors.white.withValues(alpha: 0.6),
                             fontSize: 12,
@@ -305,6 +319,33 @@ class _SecurityHomeState extends State<SecurityHome> {
                       ),
                     ),
                   ),
+                  // 🧯 زر الكشف عن الأسطوانات
+                  _menuCard(
+                    icon: Icons.local_fire_department,
+                    color: Colors.teal,
+                    title: 'الكشف عن الأسطوانات',
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ExtinguisherInspectionScreen(
+                          currentUserId: widget.securityUser.uid,
+                          currentUserName: widget.securityUser.name,
+                        ),
+                      ),
+                    ),
+                  ),
+                  // 🗄️ زر إدارة قاعدة بيانات الأسطوانات
+                  _menuCard(
+                    icon: Icons.inventory_2,
+                    color: AppColors.secondary,
+                    title: 'إدارة الأسطوانات',
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const ExtinguishersManagementScreen(),
+                      ),
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 24),
@@ -315,7 +356,7 @@ class _SecurityHomeState extends State<SecurityHome> {
                 decoration: BoxDecoration(
                   color: Theme.of(context).brightness == Brightness.dark
                       ? Colors.teal.shade900.withValues(alpha: 0.3)
-                      : Colors.teal.shade50, // ✅ NEW: دعم الثيم الداكن
+                      : Colors.teal.shade50,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: Theme.of(context).brightness == Brightness.dark
@@ -369,7 +410,10 @@ class _SecurityHomeState extends State<SecurityHome> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
             gradient: LinearGradient(
-              colors: [color.withValues(alpha: 0.08), color.withValues(alpha: 0.02)],
+              colors: [
+                color.withValues(alpha: 0.08),
+                color.withValues(alpha: 0.02),
+              ],
               begin: Alignment.topRight,
               end: Alignment.bottomLeft,
             ),

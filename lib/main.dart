@@ -15,7 +15,7 @@ import 'utils/constants.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 // ── PocketBase Client ───────────────────────────────────
-const String kPocketBaseUrl = 'http://10.1.1.211:8090';
+const String kPocketBaseUrl = 'https://tribal-wan-never-army.trycloudflare.com';
 late final PocketBase pb;
 
 void main() {
@@ -62,6 +62,11 @@ class _SafiAppState extends State<SafiApp> {
 
     // تهيئة المظهر المحفوظ
     await ThemeService.initTheme();
+
+    // إزالة شاشة Splash الأصلية (الخاصة بنظام التشغيل) الآن بعد اكتمال
+    // التهيئة — بدون هذا الاستدعاء تبقى شاشة splash الأصلية عالقة فوق كل
+    // شيء إلى الأبد (لأن preserve() في main() تُجمّدها ولا تُزال تلقائياً).
+    FlutterNativeSplash.remove();
   }
 
   @override
@@ -139,9 +144,9 @@ class _SafiAppState extends State<SafiApp> {
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppColors.primary, width: 2),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding:
+        const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       ),
-      // ✅ FIX: CardThemeData بدلاً من CardTheme
       cardTheme: CardThemeData(
         color: Colors.white,
         elevation: 2,
@@ -187,11 +192,11 @@ class _SafiAppState extends State<SafiApp> {
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: Color(0xFF90CAF9), width: 2),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding:
+        const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         fillColor: const Color(0xFF1E1E1E),
         filled: true,
       ),
-      // ✅ FIX: CardThemeData بدلاً من CardTheme + BorderRadius.circular
       cardTheme: const CardThemeData(
         color: Color(0xFF1E1E1E),
         elevation: 2,

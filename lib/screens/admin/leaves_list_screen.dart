@@ -55,183 +55,195 @@ class LeavesListScreen extends StatelessWidget {
   }
 
   Widget _leaveCard(BuildContext context, DatabaseService db, LeaveModel l) {    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: l.status == LeaveStatus.active || l.status == LeaveStatus.late
-            ? BorderSide(color: Colors.orange.shade300, width: 2)
-            : BorderSide.none,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.orange.shade100,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(l.leaveNumber,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 12)),
+    margin: const EdgeInsets.only(bottom: 12),
+    elevation: 2,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(12),
+      side: l.status == LeaveStatus.active || l.status == LeaveStatus.late
+          ? BorderSide(color: Colors.orange.shade300, width: 2)
+          : BorderSide.none,
+    ),
+    child: Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding:
+                const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.orange.shade100,
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                Container(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: l.statusColor.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: l.statusColor, width: 1),
-                  ),
-                  child: Text(l.statusLabel,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 12)),
-                ),
-              ],
-            ),
-            const Divider(height: 24),
-            Row(
-              children: [
-                const Icon(Icons.person, size: 18, color: Colors.grey),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(l.employeeName,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 16)),
-                ),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Text(
-              '${l.employeeDepartment} | سجّلها: ${l.requestedByName}',
-              style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
-            ),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade50,
-                borderRadius: BorderRadius.circular(8),
+                child: Text(l.leaveNumber,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 12)),
               ),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.exit_to_app,
-                          size: 16, color: Colors.grey),
-                      const SizedBox(width: 8),
-                      Text(
-                        'خروج: ${l.exitTime.hour.toString().padLeft(2, '0')}:${l.exitTime.minute.toString().padLeft(2, '0')}',
-                        style: const TextStyle(fontSize: 14),
-                      ),
-                    ],
-                  ),
+              Container(
+                padding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: l.statusColor.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: l.statusColor, width: 1),
+                ),
+                child: Text(l.statusLabel,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 12)),
+              ),
+            ],
+          ),
+          const Divider(height: 24),
+          Row(
+            children: [
+              const Icon(Icons.person, size: 18, color: Colors.grey),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(l.employeeName,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 16)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '${l.employeeDepartment} | سجّلها: ${l.requestedByName}',
+            style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+          ),
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              Icon(Icons.confirmation_number_outlined,
+                  size: 14, color: Colors.grey.shade500),
+              const SizedBox(width: 4),
+              Text(
+                'رقم الإيصال: ${l.receiptNumber}',
+                style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade50,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.exit_to_app,
+                        size: 16, color: Colors.grey),
+                    const SizedBox(width: 8),
+                    Text(
+                      'خروج: ${l.exitTime.hour.toString().padLeft(2, '0')}:${l.exitTime.minute.toString().padLeft(2, '0')}',
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    const Icon(Icons.keyboard_return,
+                        size: 16, color: Colors.grey),
+                    const SizedBox(width: 8),
+                    Text(
+                      'رجوع متوقع: ${l.expectedReturn.hour.toString().padLeft(2, '0')}:${l.expectedReturn.minute.toString().padLeft(2, '0')}',
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                  ],
+                ),
+                if (l.actualReturn != null) ...[
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      const Icon(Icons.keyboard_return,
-                          size: 16, color: Colors.grey),
+                      Icon(Icons.check_circle,
+                          size: 16,
+                          color: l.isLate ? Colors.red : Colors.green),
                       const SizedBox(width: 8),
                       Text(
-                        'رجوع متوقع: ${l.expectedReturn.hour.toString().padLeft(2, '0')}:${l.expectedReturn.minute.toString().padLeft(2, '0')}',
-                        style: const TextStyle(fontSize: 14),
+                        'رجوع فعلي: ${l.actualReturn!.hour.toString().padLeft(2, '0')}:${l.actualReturn!.minute.toString().padLeft(2, '0')}',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: l.isLate ? Colors.red : Colors.green,
+                          fontWeight: l.isLate
+                              ? FontWeight.bold
+                              : FontWeight.normal,
+                        ),
                       ),
                     ],
                   ),
-                  if (l.actualReturn != null) ...[
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Icon(Icons.check_circle,
-                            size: 16,
-                            color: l.isLate ? Colors.red : Colors.green),
-                        const SizedBox(width: 8),
-                        Text(
-                          'رجوع فعلي: ${l.actualReturn!.hour.toString().padLeft(2, '0')}:${l.actualReturn!.minute.toString().padLeft(2, '0')}',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: l.isLate ? Colors.red : Colors.green,
-                            fontWeight: l.isLate
-                                ? FontWeight.bold
-                                : FontWeight.normal,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Icon(Icons.label, size: 14, color: Colors.grey.shade500),
-                const SizedBox(width: 4),
-                Text(l.reasonLabel,
-                    style: TextStyle(
-                        color: Colors.grey.shade600, fontSize: 13)),
-                if (l.reasonDetails != null) ...[
-                  const SizedBox(width: 8),
-                  Text('(${l.reasonDetails})',
-                      style: TextStyle(
-                          color: Colors.grey.shade500, fontSize: 12)),
                 ],
               ],
             ),
-            const SizedBox(height: 4),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Icon(Icons.label, size: 14, color: Colors.grey.shade500),
+              const SizedBox(width: 4),
+              Text(l.reasonLabel,
+                  style: TextStyle(
+                      color: Colors.grey.shade600, fontSize: 13)),
+              if (l.reasonDetails != null) ...[
+                const SizedBox(width: 8),
+                Text('(${l.reasonDetails})',
+                    style: TextStyle(
+                        color: Colors.grey.shade500, fontSize: 12)),
+              ],
+            ],
+          ),
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              Icon(Icons.calendar_today,
+                  size: 14, color: Colors.grey.shade500),
+              const SizedBox(width: 4),
+              Text(
+                '${l.createdAt.day}/${l.createdAt.month}/${l.createdAt.year}',
+                style:
+                TextStyle(color: Colors.grey.shade500, fontSize: 12),
+              ),
+            ],
+          ),
+
+          // ── أزرار تسجيل العودة (فقط للإذونات النشطة/المتأخرة) ──
+          if (l.status == LeaveStatus.active ||
+              l.status == LeaveStatus.late) ...[
+            const SizedBox(height: 12),
             Row(
               children: [
-                Icon(Icons.calendar_today,
-                    size: 14, color: Colors.grey.shade500),
-                const SizedBox(width: 4),
-                Text(
-                  '${l.createdAt.day}/${l.createdAt.month}/${l.createdAt.year}',
-                  style:
-                  TextStyle(color: Colors.grey.shade500, fontSize: 12),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => _markReturned(context, db, l),
+                    icon: const Icon(Icons.check_circle,
+                        size: 18, color: Colors.green),
+                    label: const Text('تسجيل العودة'),
+                    style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.green),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => _markNoReturn(context, db, l),
+                    icon: const Icon(Icons.cancel,
+                        size: 18, color: Colors.red),
+                    label: const Text('لم يعد'),
+                    style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.red),
+                  ),
                 ),
               ],
             ),
-
-            // ── أزرار تسجيل العودة (فقط للإذونات النشطة/المتأخرة) ──
-            if (l.status == LeaveStatus.active ||
-                l.status == LeaveStatus.late) ...[
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () => _markReturned(context, db, l),
-                      icon: const Icon(Icons.check_circle,
-                          size: 18, color: Colors.green),
-                      label: const Text('تسجيل العودة'),
-                      style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.green),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () => _markNoReturn(context, db, l),
-                      icon: const Icon(Icons.cancel,
-                          size: 18, color: Colors.red),
-                      label: const Text('لم يعد'),
-                      style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.red),
-                    ),
-                  ),
-                ],
-              ),
-            ],
           ],
-        ),
+        ],
       ),
+    ),
   );
   }
 

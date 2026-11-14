@@ -135,7 +135,7 @@ class EmployeeViolationsBalanceScreen extends StatelessWidget {
                   child: ListView.separated(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     itemCount: list.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 10),
+                    separatorBuilder: (_, _) => const SizedBox(height: 10),
                     itemBuilder: (ctx, index) {
                       final item = list[index];
                       return Card(

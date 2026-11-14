@@ -265,7 +265,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'SAFI FOOD COMPLEX',
+                            'ALDAFNIYA FOOD COMPLEX',
                             style: TextStyle(
                               color: Colors.white.withValues(alpha: 0.6),
                               fontSize: 12,

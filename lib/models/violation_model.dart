@@ -76,6 +76,7 @@ class ViolationModel {
   /// يبني ViolationModel من RecordModel القادم من مجموعة "violations" في PocketBase
   factory ViolationModel.fromRecord(RecordModel record) {
     final d = record.data;
+    final createdStr = record.get<String?>('created');
 
     DateTime? parseDate(dynamic v) {
       if (v == null) return null;
@@ -87,8 +88,8 @@ class ViolationModel {
     return ViolationModel(
       id: record.id,
       violationNumber: d['violation_number'] ?? '',
-      createdAt: record.created.isNotEmpty
-          ? DateTime.parse(record.created)
+      createdAt: (createdStr != null && createdStr.isNotEmpty)
+          ? DateTime.parse(createdStr)
           : DateTime.now(),
       securityOfficerId: d['security_officer_id'] ?? '',
       securityOfficerName: d['security_officer_name'] ?? '',

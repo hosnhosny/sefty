@@ -884,7 +884,7 @@ class _ReviewPanelScreenState extends State<ReviewPanelScreen>
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: v.evidenceUrls.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        separatorBuilder: (_, _) => const SizedBox(width: 8),
         itemBuilder: (ctx, i) {
           final url = v.evidenceUrls[i];
           final isVideo = ViolationModel.isVideoUrl(url);

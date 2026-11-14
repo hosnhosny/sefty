@@ -247,7 +247,7 @@ class _AddViolationScreenState extends State<AddViolationScreen> {
                       )
                           : ListView.separated(
                         itemCount: results.length,
-                        separatorBuilder: (_, __) =>
+                        separatorBuilder: (_, _) =>
                         const Divider(height: 1),
                         itemBuilder: (ctx, i) {
                           final emp = results[i];
@@ -916,7 +916,7 @@ class _AddViolationScreenState extends State<AddViolationScreen> {
               shrinkWrap: true,
               padding: EdgeInsets.zero,
               itemCount: _filteredEmployees.length,
-              separatorBuilder: (_, __) =>
+              separatorBuilder: (_, _) =>
               const Divider(height: 1, indent: 56),
               itemBuilder: (ctx, i) {
                 final emp = _filteredEmployees[i];

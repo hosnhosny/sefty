@@ -47,11 +47,15 @@ class ReportModel {
   factory ReportModel.fromRecord(RecordModel record) {
     final d = record.data;
 
+    // حقل "created" لم يعد خاصية مخصصة مضمونة الوجود في RecordModel، لذلك
+    // نقرأه عبر get<T> العام بدل record.created المهجورة.
+    final createdStr = record.get<String?>('created');
+
     return ReportModel(
       id: record.id,
       reportNumber: d['report_number'] ?? '',
-      createdAt: record.created.isNotEmpty
-          ? DateTime.parse(record.created)
+      createdAt: (createdStr != null && createdStr.isNotEmpty)
+          ? DateTime.parse(createdStr)
           : DateTime.now(),
       createdById: d['created_by_id'] ?? '',
       createdByName: d['created_by_name'] ?? '',

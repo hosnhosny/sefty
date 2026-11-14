@@ -115,7 +115,7 @@ class _SecurityManagementScreenState extends State<SecurityManagementScreen> {
             return ListView.separated(
               padding: const EdgeInsets.fromLTRB(12, 12, 12, 80),
               itemCount: users.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 8),
+              separatorBuilder: (_, _) => const SizedBox(height: 8),
               itemBuilder: (ctx, i) {
                 final u = users[i];
                 return Card(

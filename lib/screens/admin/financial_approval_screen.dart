@@ -219,7 +219,7 @@ class _FinancialApprovalScreenState extends State<FinancialApprovalScreen> {
             return ListView.separated(
               padding: const EdgeInsets.all(12),
               itemCount: violations.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 10),
+              separatorBuilder: (_, _) => const SizedBox(height: 10),
               itemBuilder: (ctx, i) {
                 final v = violations[i];
                 final isProcessing = _processingIds.contains(v.id);
